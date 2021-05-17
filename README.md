@@ -30,6 +30,9 @@ language.
   - Format constants in ASCII range as chars
 - wspack compresser
   - wsx-format compression and decompression
+- wspace interpreter
+  - File execution
+  - Whitespace Assembly REPL
 
 ## License
 
