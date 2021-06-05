@@ -33,6 +33,9 @@ language.
 - wspace interpreter
   - File execution
   - Whitespace Assembly REPL
+- Backends
+  - Truffle
+  - LLVM
 
 ## License
 
