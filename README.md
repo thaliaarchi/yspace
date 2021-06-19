@@ -33,6 +33,8 @@ language.
 - wspace interpreter
   - File execution
   - Whitespace Assembly REPL
+- Use e-graphs for optimization ordering
+  ([Egg](https://egraphs-good.github.io/) library)
 - Backends
   - Truffle
   - LLVM
