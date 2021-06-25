@@ -6,9 +6,24 @@ wspace implicit_end.ws
 
 wspace underflow_dup.ws
 wspace underflow_copy.ws
+wspace underflow_copy_unused.ws
+wspace underflow_swap.ws
 wspace underflow_drop.ws
 wspace underflow_slide.ws
-wspace call_underflow_ret.ws
+wspace underflow_add.ws
+wspace underflow_sub.ws
+wspace underflow_mul.ws
+wspace underflow_div.ws
+wspace underflow_mod.ws
+wspace underflow_store.ws
+wspace underflow_retrieve.ws
+wspace underflow_jz.ws
+wspace underflow_jn.ws
+wspace underflow_ret.ws
+wspace underflow_printc.ws
+wspace underflow_printi.ws
+wspace underflow_readc.ws
+wspace underflow_readi.ws
 
 wspace push_zero_empty.ws
 
