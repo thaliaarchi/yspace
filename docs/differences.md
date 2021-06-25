@@ -101,7 +101,7 @@ I/O:
   - error (wspace)
   - 0
 - Number delimiter
-  - line break (TODO: LF/CRLF/CR) (wspace)
+  - LF (wspace)
   - whitespace
 
 `printi` number format:

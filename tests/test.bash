@@ -39,6 +39,9 @@ wspace retrieve_unset.ws && echo
 wspace retrieve_unset_unused.ws
 wspace retrieve_unset_less.ws && echo
 
+wspace long_number_334_bits.ws && echo
+wspace long_number_54_bits.ws && echo
+
 wspace printc_negative.ws
 
 wspace leading_zero_labels.ws && echo
