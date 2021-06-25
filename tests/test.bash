@@ -43,6 +43,7 @@ wspace long_number_334_bits.ws && echo
 wspace long_number_54_bits.ws && echo
 
 wspace printc_negative.ws
+wspace printc_too_large.ws
 
 wspace leading_zero_labels.ws && echo
 wspace printi_negative_zero.ws && echo
@@ -59,3 +60,6 @@ printf ' \t\v\f\r- \t\v\f\r5 \t\v\f\r' | wspace readi_echo.ws && echo
 printf '\xff' | wspace readc_echo.ws && echo
 echo '0b101' | wspace readi_echo.ws && echo
 echo '+5' | wspace readi_echo.ws && echo
+
+wspace printc_all_surrogates.ws > /dev/null
+# wspace printc_all_codepoints.ws > /dev/null

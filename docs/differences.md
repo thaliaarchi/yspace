@@ -44,10 +44,17 @@ Bounds:
 
 I/O:
 
-- Character set
+- `readc` encoding
   - ASCII
   - UTF-8, error on invalid (wspace)
-  - UTF-16, error on invalid
+  - UTF-8, U+FFFD replacement char for invalid
+  - UTF-8, -1 for invalid
+- `printc` encoding
+  - ASCII
+  - UTF-8, error on invalid (wspace)
+  - UTF-8, U+FFFD replacement char for invalid
+- `printc` invalid codepoints
+  - negative, U+D800 to U+DFFF surrogates, and over U+10FFFF (wspace)
 - Reading line breaks
   - CRLF is collapsed to LF (wsjq on Windows)
 - EOF behavior
@@ -55,7 +62,7 @@ I/O:
   - 0
   - -1
 - Flushing
-  - flush after print, e.g. pi.ws (wspace)
+  - unbuffered, e.g. pi.ws (wspace)
   - flush before read, e.g. calc.ws
   - buffered (LOLCODE)
 
