@@ -7,12 +7,12 @@ Syntax:
   - LF, CRLF
   - LF, CRLF, CR
 - Number `0`
-  - requires sign and bits
+  - requires sign and bits (conrad)
   - requires sign (wspace)
   - may omit sign (Nebula)
 - Label `0`
-  - requires bits
-  - empty allowed
+  - requires bits (conrad)
+  - empty allowed (wspace)
 - Label leading zeros
   - leading zeros are unique (wspace)
   - leading zeros are ignored (Nebula)

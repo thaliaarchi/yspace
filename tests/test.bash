@@ -25,12 +25,19 @@ wspace underflow_printi.ws
 wspace underflow_readc.ws
 wspace underflow_readi.ws
 
+wspace unknown_instruction.ws
+
 wspace push_zero_empty.ws
+wspace push_zero_empty_unused.ws
 
 wspace div_zero.ws
 wspace mod_zero.ws
 wspace div_zero_unused.ws
 wspace mod_zero_unused.ws
+
+wspace retrieve_unset.ws && echo
+wspace retrieve_unset_unused.ws
+wspace retrieve_unset_less.ws && echo
 
 wspace printc_negative.ws
 
