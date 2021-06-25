@@ -9,7 +9,7 @@ language.
 - wspls language server
   - Inline values for instruction names that are preserved while editing
   - Debugging
-- wsvs VS Code extension
+- wsvsc VS Code extension
   - Syntax highlighting
   - Render whitespace characters
   - Disassembly panel
