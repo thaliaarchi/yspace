@@ -68,6 +68,11 @@ wspace retrieve_unset_less.ws && echo
 
 wspace leading_zero_labels.ws && echo
 
+wspace undefined_label_call.ws
+wspace undefined_label_jmp.ws
+wspace undefined_label_jz.ws
+wspace undefined_label_jn.ws
+
 wspace printc_negative.ws
 wspace printc_too_large.ws
 
