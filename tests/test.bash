@@ -9,6 +9,15 @@ wspace encoding_invalid_utf8.ws && echo
 wspace encoding_invalid_utf8_lazy.ws && echo
 wspace unknown_instruction.ws
 
+wspace unterminated_push.ws
+wspace unterminated_copy.ws
+wspace unterminated_slide.ws
+wspace unterminated_label.ws
+wspace unterminated_call.ws
+wspace unterminated_jmp.ws
+wspace unterminated_jz.ws
+wspace unterminated_jn.ws
+
 wspace underflow_dup.ws
 wspace underflow_swap.ws
 wspace underflow_drop.ws
