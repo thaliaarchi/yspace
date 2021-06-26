@@ -61,7 +61,7 @@ and are non-normative.
 | readc    | TLTS |   | addr --        | addr <- char | Read a character and place it in the location given by the top of the stack |
 | readi    | TLTT |   | addr --        | addr <- int  | Read a number and place it in the location given by the top of the stack |
 
-### Non-standard extensions
+### Non-standard instructions
 
 STT, TSTL, TSL, TTL, TLSL, TLTL, TLL, LLS, and LLT
 

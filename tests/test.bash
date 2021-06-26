@@ -25,6 +25,9 @@ wspace underflow_printi.ws
 wspace underflow_readc.ws
 wspace underflow_readi.ws
 
+wspace encoding_utf8_bom.ws && echo
+wspace encoding_invalid_utf8.ws && echo
+wspace encoding_invalid_utf8_lazy.ws && echo
 wspace unknown_instruction.ws
 
 wspace push_zero_empty.ws
@@ -62,4 +65,4 @@ echo '0b101' | wspace readi_echo.ws && echo
 echo '+5' | wspace readi_echo.ws && echo
 
 wspace printc_all_surrogates.ws > /dev/null
-# wspace printc_all_codepoints.ws > /dev/null
+# wspace printc_all_codepoints.ws > /dev/null # slow
