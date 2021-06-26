@@ -32,33 +32,39 @@ wspace underflow_readi.ws
 
 wspace push_zero_empty.ws
 wspace push_zero_empty_unused.ws
+wspace push_zero_sign_only.ws
 
-wspace copy_error.ws
-wspace copy_error_unused.ws
+wspace copy_zero_empty.ws
+wspace copy_zero_empty_unused.ws
+wspace copy_zero_sign_only.ws
 wspace copy_negative.ws
 wspace copy_negative_unused.ws
+wspace copy_error.ws
+wspace copy_error_unused.ws
 
 wspace slide_zero.ws && echo
+wspace slide_zero_empty.ws && echo
+wspace slide_zero_sign_only.ws && echo
 wspace slide_negative.ws && echo
 wspace slide_less.ws && echo
 
 wspace div_zero.ws
-wspace mod_zero.ws
 wspace div_zero_unused.ws
+wspace mod_zero.ws
 wspace mod_zero_unused.ws
 
 wspace retrieve_unset.ws && echo
 wspace retrieve_unset_unused.ws
 wspace retrieve_unset_less.ws && echo
 
-wspace long_number_334_bits.ws && echo
-wspace long_number_54_bits.ws && echo
+wspace leading_zero_labels.ws && echo
 
 wspace printc_negative.ws
 wspace printc_too_large.ws
 
-wspace leading_zero_labels.ws && echo
 wspace printi_negative_zero.ws && echo
+wspace printi_long_number_334_bits.ws && echo
+wspace printi_long_number_54_bits.ws && echo
 
 echo -n 'ß' | wspace readc_echo.ws && echo
 printf '\r\n' | wspace readc_echo.ws && echo
