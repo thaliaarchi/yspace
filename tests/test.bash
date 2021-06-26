@@ -10,8 +10,6 @@ wspace encoding_invalid_utf8_lazy.ws && echo
 wspace unknown_instruction.ws
 
 wspace underflow_dup.ws
-wspace underflow_copy.ws
-wspace underflow_copy_unused.ws
 wspace underflow_swap.ws
 wspace underflow_drop.ws
 wspace underflow_slide.ws
@@ -35,6 +33,8 @@ wspace underflow_readi.ws
 wspace push_zero_empty.ws
 wspace push_zero_empty_unused.ws
 
+wspace copy_error.ws
+wspace copy_error_unused.ws
 wspace copy_negative.ws
 wspace copy_negative_unused.ws
 
