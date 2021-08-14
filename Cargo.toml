@@ -1,0 +1,15 @@
+[package]
+name = "yspace"
+version = "0.1.0"
+authors = ["Andrew Archibald <andrew@aarchibald.com>"]
+description = "A work-in-progress toolchain for the Whitespace programming language."
+edition = "2018"
+readme = "README.md"
+homepage = "https://github.com/andrewarchi/yspace"
+repository = "https://github.com/andrewarchi/yspace"
+license = "MPL-2.0"
+keywords = ["whitespace", "compiler"]
+categories = ["compilers"]
+
+[dependencies]
+bstr = "0.2"
