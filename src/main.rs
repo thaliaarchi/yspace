@@ -1,5 +1,5 @@
 use self::Token::*;
-use std::{char, env, fs};
+use std::{char, env, fs, str};
 
 #[derive(Debug, Clone)]
 pub enum Token {
@@ -15,7 +15,7 @@ struct Lexer<'a> {
 }
 
 impl<'a> Lexer<'a> {
-    pub fn new<T: AsRef<[u8]>>(src: &'a T, map: Mapping) -> Self {
+    pub fn new<B: AsRef<[u8]>>(src: &'a B, map: Mapping) -> Self {
         Lexer {
             src: src.as_ref(),
             i: 0,
@@ -25,16 +25,17 @@ impl<'a> Lexer<'a> {
 }
 
 impl<'a> Iterator for Lexer<'a> {
-    type Item = Token;
+    type Item = (Token, &'a str);
 
-    fn next(&mut self) -> Option<Token> {
+    fn next(&mut self) -> Option<(Token, &'a str)> {
+        let start = self.i;
         while self.i < self.src.len() {
             // Lazily decode UTF-8
             let (ch, size) = bstr::decode_utf8(&self.src[self.i..]);
             self.i += size;
-            match self.map.from_char(ch.expect("invalid UTF-8")) {
-                Some(tok) => return Some(tok),
-                None => {}
+            if let Some(tok) = self.map.from_char(ch.expect("invalid UTF-8")) {
+                let comment = &self.src[start..self.i - size];
+                return Some((tok, unsafe { str::from_utf8_unchecked(comment) }));
             }
         }
         None
@@ -78,6 +79,6 @@ fn main() -> std::io::Result<()> {
     let src = fs::read(filename)?;
     let l = Lexer::new(&src, Mapping::new(' ', '\t', '\n'));
     let stl = Mapping::new('S', 'T', 'L');
-    l.for_each(|tok| print!("{}", stl.to_char(tok)));
+    l.for_each(|(tok, comment)| println!("{}:{}", stl.to_char(tok), comment));
     Ok(())
 }
