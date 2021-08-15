@@ -42,6 +42,57 @@ impl<'a> Iterator for Lexer<'a> {
     }
 }
 
+struct BitLexer<'a> {
+    src: &'a [u8],
+    i: usize,
+    bit: i8,
+}
+
+impl<'a> BitLexer<'a> {
+    pub fn new<B: AsRef<[u8]>>(src: &'a B) -> Self {
+        BitLexer {
+            src: src.as_ref(),
+            i: 0,
+            bit: 7,
+        }
+    }
+
+    fn next_bit(&mut self) -> Option<bool> {
+        if self.i >= self.src.len() {
+            return None;
+        }
+        let b = self.src[self.i];
+        // Ignore trailing zeros on the last byte
+        if self.i + 1 == self.src.len() && b & (0xff >> self.bit) == 0 {
+            return None;
+        }
+        let bit = b & (1 << self.bit) != 0;
+        if self.bit == 0 {
+            self.bit = 7;
+            self.i += 1;
+        } else {
+            self.bit += 1;
+        }
+        Some(bit)
+    }
+}
+
+impl<'a> Iterator for BitLexer<'a> {
+    type Item = Token;
+
+    fn next(&mut self) -> Option<Token> {
+        match self.next_bit() {
+            Some(true) => match self.next_bit() {
+                Some(true) => Some(L),
+                Some(false) => Some(T),
+                None => None, // marker bit
+            },
+            Some(false) => Some(S),
+            None => None,
+        }
+    }
+}
+
 struct Mapping {
     s: char,
     t: char,
