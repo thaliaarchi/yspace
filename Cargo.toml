@@ -13,3 +13,6 @@ categories = ["compilers"]
 
 [dependencies]
 bstr = "0.2"
+
+[profile.release]
+lto = true
