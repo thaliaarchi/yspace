@@ -41,5 +41,5 @@ language.
 
 ## License
 
-This project is made available under the
-[Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/).
+This project is made available under the terms of the
+[Mozilla Public License, v. 2.0](https://www.mozilla.org/en-US/MPL/2.0/).
