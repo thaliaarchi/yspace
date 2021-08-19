@@ -4,7 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-use std::{char, str};
+use std::char;
 pub use Token::{L, S, T};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -32,17 +32,19 @@ impl<'a> Lexer<'a> {
 }
 
 impl<'a> Iterator for Lexer<'a> {
-    type Item = (Token, &'a str);
+    type Item = Token;
 
-    fn next(&mut self) -> Option<(Token, &'a str)> {
-        let start = self.i;
+    fn next(&mut self) -> Option<Token> {
+        // let start = self.i;
         while self.i < self.src.len() {
             // Lazily decode UTF-8
             let (ch, size) = bstr::decode_utf8(&self.src[self.i..]);
             self.i += size;
             if let Some(tok) = self.map.from_char(ch.expect("invalid UTF-8")) {
-                let comment = &self.src[start..self.i - size];
-                return Some((tok, unsafe { str::from_utf8_unchecked(comment) }));
+                // let comment = &self.src[start..self.i - size];
+                // SAFETY: already checked as UTF-8
+                // return Some((tok, unsafe { str::from_utf8_unchecked(comment) }));
+                return Some(tok);
             }
         }
         None

@@ -43,17 +43,17 @@ impl<'a> BitLexer<'a> {
 }
 
 impl<'a> Iterator for BitLexer<'a> {
-    type Item = (Token, &'a str);
+    type Item = Token;
 
     #[inline]
-    fn next(&mut self) -> Option<(Token, &'a str)> {
+    fn next(&mut self) -> Option<Token> {
         match self.next_bit() {
             Some(true) => match self.next_bit() {
-                Some(true) => Some((L, "")),
-                Some(false) => Some((T, "")),
+                Some(true) => Some(L),
+                Some(false) => Some(T),
                 None => None, // marker bit
             },
-            Some(false) => Some((S, "")),
+            Some(false) => Some(S),
             None => None,
         }
     }

@@ -14,5 +14,10 @@ categories = ["compilers"]
 [dependencies]
 bstr = "0.2"
 
+[dependencies.rug]
+version = "1.13"
+default-features = false
+features = ["integer"]
+
 [profile.release]
 lto = true
