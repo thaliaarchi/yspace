@@ -8,7 +8,7 @@ use crate::token::{
     Lexer,
     Token::{self, L, S, T},
 };
-pub use rug::{integer::Order, Integer};
+use rug::{integer::Order, ops::NegAssign, Integer};
 use std::fmt;
 pub use Inst::*;
 
@@ -76,6 +76,7 @@ pub struct Int {
     sign: Sign,
 }
 
+#[derive(PartialEq)]
 pub enum Sign {
     Pos,
     Neg,
@@ -152,12 +153,8 @@ impl RawUint {
         self.len() - self.leading_zeros()
     }
 
-    fn as_integer(&self) -> Integer {
-        if self.buf.len() == 0 {
-            Integer::new()
-        } else {
-            Integer::from_digits(&self.buf, Order::MsfBe) // Order::LsfBe
-        }
+    fn to_integer(&self) -> Integer {
+        Integer::from_digits(&self.buf, Order::MsfBe)
     }
 
     fn len(&self) -> usize {
@@ -276,13 +273,16 @@ impl Parser<'_> {
             L => return Some(Int::empty()),
         };
         let raw = self.parse_uint()?;
-        let val = raw.as_integer();
+        let mut val = raw.to_integer();
+        if sign == Sign::Neg {
+            val.neg_assign();
+        }
         Some(Int { val, raw, sign })
     }
 
     fn parse_label(&mut self) -> Option<Label> {
         let raw = self.parse_uint()?;
-        let val = raw.as_integer();
+        let val = raw.to_integer();
         Some(Label { val, raw })
     }
 }
