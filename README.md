@@ -1,11 +1,10 @@
 # yspace
 
 yspace is a work-in-progress toolchain for the Whitespace programming
-language.
+language written in Rust.
 
 ## Planned features
 
-- Written in Rust
 - wspls language server
   - Inline values for instruction names that are preserved while editing
   - Debugging
@@ -33,9 +32,20 @@ language.
 - wspace interpreter
   - File execution
   - Whitespace Assembly REPL
+
+## Languages
+
+- Stack-based like Factor
+  - First-class closures (see
+    [“Closure elimination as constant propagation”](https://web.archive.org/web/20110726044425/http://factorcode.org/littledan/abstract.pdf))
+
+## Architecture plans
+
+- Written in Rust
+- Parses with parser combinators
+- LLVM backend
 - Use e-graphs for optimization ordering
   ([Egg](https://egraphs-good.github.io/) library)
-- LLVM backend
 
 ## License
 
