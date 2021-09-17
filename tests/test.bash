@@ -7,7 +7,16 @@ wspace implicit_end.ws
 wspace encoding_utf8_bom.ws && echo
 wspace encoding_invalid_utf8.ws && echo
 wspace encoding_invalid_utf8_lazy.ws && echo
-wspace unknown_instruction.ws
+
+wspace unknown_instruction_stt.ws
+wspace unknown_instruction_tstl.ws
+wspace unknown_instruction_tsl.ws
+wspace unknown_instruction_ttl.ws
+wspace unknown_instruction_tlsl.ws
+wspace unknown_instruction_tltl.ws
+wspace unknown_instruction_tll.ws
+wspace unknown_instruction_lls.ws
+wspace unknown_instruction_llt.ws
 
 wspace unterminated_push.ws
 wspace unterminated_copy.ws
