@@ -71,6 +71,9 @@ wspace div_zero_unused.ws
 wspace mod_zero.ws
 wspace mod_zero_unused.ws
 
+timeout .2s wspace store_negative.ws
+wspace retrieve_negative.ws && echo
+wspace retrieve_negative_unused.ws
 wspace retrieve_unset.ws && echo
 wspace retrieve_unset_unused.ws
 wspace retrieve_unset_less.ws && echo
