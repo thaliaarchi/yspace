@@ -12,10 +12,10 @@ keywords = ["whitespace", "compiler"]
 categories = ["compilers"]
 
 [dependencies]
-bstr = "0.2"
+bstr = "0.2.17"
 
 [dependencies.rug]
-version = "1.13"
+version = "1.14.0"
 default-features = false
 features = ["integer"]
 

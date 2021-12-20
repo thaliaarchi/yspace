@@ -9,14 +9,16 @@ mod syntax;
 mod token;
 use std::{env, fs};
 use syntax::Parser;
-use token::Lexer;
+use token::{Lexer, Mapping};
 
 fn main() -> std::io::Result<()> {
-    let filename = env::args_os().nth(1).expect("Usage: wspace <file>");
+    let filename = env::args_os().nth(1).expect("Usage: yspace <file>");
     let src = fs::read(filename)?;
-    let mut lex = Lexer::new(&src, token::DEFAULT);
-    // l.for_each(|tok| print!("{}", token::STL.to_char(&tok)));
+    let mut lex = Lexer::new(&src, Mapping::DEFAULT);
     let p = Parser::new(&mut lex);
-    p.for_each(|inst| println!("{}", inst));
+    let mut v = Vec::new();
+    p.for_each(|inst| inst.to_tokens(&mut v));
+    v.into_iter()
+        .for_each(|tok| print!("{}", Mapping::DEFAULT.to_char(tok)));
     Ok(())
 }

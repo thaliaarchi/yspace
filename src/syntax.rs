@@ -9,7 +9,7 @@ use crate::token::{
     Token::{self, L, S, T},
 };
 use rug::{integer::Order, ops::NegAssign, Integer};
-use std::fmt;
+use std::{fmt, str};
 pub use Inst::*;
 
 pub enum Inst {
@@ -39,33 +39,105 @@ pub enum Inst {
     Readi,
 }
 
+impl Inst {
+    pub fn arg(&self) -> Option<&Int> {
+        match self {
+            Push(i) => Some(i),
+            Copy(i) => Some(i),
+            Slide(i) => Some(i),
+            _ => None,
+        }
+    }
+
+    pub fn label(&self) -> Option<&Label> {
+        match self {
+            Label(l) => Some(l),
+            Call(l) => Some(l),
+            Jmp(l) => Some(l),
+            Jz(l) => Some(l),
+            Jn(l) => Some(l),
+            _ => None,
+        }
+    }
+
+    pub fn to_tokens(&self, v: &mut Vec<Token>) {
+        v.extend_from_slice(self.ws_opcode());
+        if let Some(n) = self.arg() {
+            n.to_tokens(v);
+        } else if let Some(l) = self.label() {
+            l.to_tokens(v);
+        }
+    }
+
+    pub fn ws_opcode(&self) -> &'static [Token] {
+        match self {
+            Push(_) => &[S, S],
+            Dup => &[S, L, S],
+            Copy(_) => &[S, T, S],
+            Swap => &[S, L, T],
+            Drop => &[S, L, L],
+            Slide(_) => &[S, T, L],
+            Add => &[T, S, S, S],
+            Sub => &[T, S, S, T],
+            Mul => &[T, S, S, L],
+            Div => &[T, S, T, S],
+            Mod => &[T, S, T, T],
+            Store => &[T, T, S],
+            Retrieve => &[T, T, T],
+            Label(_) => &[L, S, S],
+            Call(_) => &[L, S, T],
+            Jmp(_) => &[L, S, L],
+            Jz(_) => &[L, T, S],
+            Jn(_) => &[L, T, T],
+            Ret => &[L, T, L],
+            End => &[L, L, L],
+            Printc => &[T, L, S, S],
+            Printi => &[T, L, S, T],
+            Readc => &[T, L, T, S],
+            Readi => &[T, L, T, T],
+        }
+    }
+
+    pub fn wsa_opcode(&self) -> &'static str {
+        match self {
+            Push(_) => "push",
+            Dup => "dup",
+            Copy(_) => "copy",
+            Swap => "swap",
+            Drop => "drop",
+            Slide(_) => "slide",
+            Add => "add",
+            Sub => "sub",
+            Mul => "mul",
+            Div => "div",
+            Mod => "mod",
+            Store => "store",
+            Retrieve => "retrieve",
+            Label(_) => "label",
+            Call(_) => "call",
+            Jmp(_) => "jmp",
+            Jz(_) => "jz",
+            Jn(_) => "jn",
+            Ret => "ret",
+            End => "end",
+            Printc => "printc",
+            Printi => "printi",
+            Readc => "readc",
+            Readi => "readi",
+        }
+    }
+}
+
 impl fmt::Display for Inst {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Push(i) => write!(f, "push {}", i.val),
-            Dup => write!(f, "dup"),
-            Copy(i) => write!(f, "copy {}", i.val),
-            Swap => write!(f, "swap"),
-            Drop => write!(f, "drop"),
-            Slide(i) => write!(f, "slide {}", i.val),
-            Add => write!(f, "add"),
-            Sub => write!(f, "sub"),
-            Mul => write!(f, "mul"),
-            Div => write!(f, "div"),
-            Mod => write!(f, "mod"),
-            Store => write!(f, "store"),
-            Retrieve => write!(f, "retrieve"),
-            Label(l) => write!(f, "label {}", l.val),
-            Call(l) => write!(f, "call {}", l.val),
-            Jmp(l) => write!(f, "jmp {}", l.val),
-            Jz(l) => write!(f, "jz {}", l.val),
-            Jn(l) => write!(f, "jn {}", l.val),
-            Ret => write!(f, "ret"),
-            End => write!(f, "end"),
-            Printc => write!(f, "printc"),
-            Printi => write!(f, "printi"),
-            Readc => write!(f, "readc"),
-            Readi => write!(f, "readi"),
+        if let Label(l) = self {
+            write!(f, "{}:", l.val)
+        } else if let Some(n) = self.arg() {
+            write!(f, "{} {}", self.wsa_opcode(), n.val)
+        } else if let Some(l) = self.label() {
+            write!(f, "{} {}", self.wsa_opcode(), l.val)
+        } else {
+            write!(f, "{}", self.wsa_opcode())
         }
     }
 }
@@ -76,7 +148,7 @@ pub struct Int {
     sign: Sign,
 }
 
-#[derive(PartialEq)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum Sign {
     Pos,
     Neg,
@@ -91,6 +163,15 @@ impl Int {
             sign: Sign::Empty,
         }
     }
+
+    pub fn to_tokens(&self, v: &mut Vec<Token>) {
+        match self.sign {
+            Sign::Pos => v.push(S),
+            Sign::Neg => v.push(T),
+            Sign::Empty => {}
+        }
+        self.raw.to_tokens(v);
+    }
 }
 
 pub struct Label {
@@ -98,16 +179,32 @@ pub struct Label {
     raw: RawUint,
 }
 
+impl Label {
+    pub fn as_utf8(&self) -> Option<&str> {
+        if self.raw.len() % 8 == 0 {
+            if let Ok(s) = str::from_utf8(&self.raw.buf) {
+                return Some(s);
+            }
+        }
+        None
+    }
+
+    pub fn to_tokens(&self, v: &mut Vec<Token>) {
+        self.raw.to_tokens(v);
+    }
+}
+
+#[derive(Clone)]
 struct RawUint {
     buf: Vec<u8>,
-    first_bits: u8,
+    len: usize,
 }
 
 impl RawUint {
     fn new() -> Self {
         RawUint {
             buf: Vec::new(),
-            first_bits: 0,
+            len: 0,
         }
     }
 
@@ -128,28 +225,32 @@ impl RawUint {
         }
         RawUint {
             buf,
-            first_bits: bit,
+            len: toks.len(),
         }
+    }
+
+    fn to_tokens(&self, toks: &mut Vec<Token>) {
+        toks.reserve(self.len + 1);
+        for i in 0..self.len {
+            toks.push(if self.bit(i) { T } else { S })
+        }
+        toks.push(L)
+    }
+
+    fn bit(&self, i: usize) -> bool {
+        (self.buf[i / 8] >> (7 - i % 8)) & 1 == 1
     }
 
     fn leading_zeros(&self) -> usize {
-        if self.buf.len() == 0 {
-            return 0;
-        }
-        if self.buf[0] != 0 {
-            return self.buf[0].leading_zeros() as usize - (8 - self.first_bits as usize);
-        }
-        let mut leading_zeros = self.first_bits as usize;
-        for b in &self.buf[1..] {
+        for (i, b) in self.buf.iter().enumerate() {
             if *b != 0 {
-                return leading_zeros + b.leading_zeros() as usize;
+                return i * 8 + b.leading_zeros() as usize - self.len % 8;
             }
-            leading_zeros += 8;
         }
-        leading_zeros
+        self.len
     }
 
-    fn significant_zeros(&self) -> usize {
+    fn significant_bits(&self) -> usize {
         self.len() - self.leading_zeros()
     }
 
@@ -158,18 +259,36 @@ impl RawUint {
     }
 
     fn len(&self) -> usize {
-        self.buf.len() * 8 + self.first_bits as usize
+        self.len
     }
 }
 
 pub struct Parser<'a> {
     lex: &'a mut Lexer<'a>,
-    toks: Vec<Token>,
+    tok_buf: Vec<Token>,
+    toks: usize,
+    comments: Option<Vec<String>>,
 }
 
 impl<'a> Parser<'a> {
     pub fn new(lex: &'a mut Lexer<'a>) -> Self {
-        Parser { lex, toks: vec![] }
+        Parser {
+            lex,
+            tok_buf: vec![],
+            toks: 0,
+            comments: None,
+        }
+    }
+
+    fn next_token(&mut self) -> Option<Token> {
+        let (tok, comment) = self.lex.next()?;
+        if comment.len() != 0 {
+            if self.comments == None {
+                self.comments = Some(vec![String::new(); self.toks]);
+            }
+            self.comments.as_mut().unwrap().push(comment.to_string());
+        }
+        Some(tok)
     }
 }
 
@@ -177,31 +296,32 @@ impl Iterator for Parser<'_> {
     type Item = Inst;
 
     fn next(&mut self) -> Option<Inst> {
-        match self.lex.next()? {
+        self.toks = 0;
+        match self.next_token()? {
             // Stack manipulation
-            S => match self.lex.next()? {
+            S => match self.next_token()? {
                 S => Some(Push(self.parse_int()?)),
-                T => match self.lex.next()? {
+                T => match self.next_token()? {
                     S => Some(Copy(self.parse_int()?)),
                     T => None,
                     L => Some(Slide(self.parse_int()?)),
                 },
-                L => match self.lex.next()? {
+                L => match self.next_token()? {
                     S => Some(Dup),
                     T => Some(Swap),
                     L => Some(Drop),
                 },
             },
 
-            T => match self.lex.next()? {
+            T => match self.next_token()? {
                 // Arithmetic
-                S => match self.lex.next()? {
-                    S => match self.lex.next()? {
+                S => match self.next_token()? {
+                    S => match self.next_token()? {
                         S => Some(Add),
                         T => Some(Sub),
                         L => Some(Mul),
                     },
-                    T => match self.lex.next()? {
+                    T => match self.next_token()? {
                         S => Some(Div),
                         T => Some(Mod),
                         L => None,
@@ -210,20 +330,20 @@ impl Iterator for Parser<'_> {
                 },
 
                 // Heap access
-                T => match self.lex.next()? {
+                T => match self.next_token()? {
                     S => Some(Store),
                     T => Some(Retrieve),
                     L => None,
                 },
 
                 // I/O
-                L => match self.lex.next()? {
-                    S => match self.lex.next()? {
+                L => match self.next_token()? {
+                    S => match self.next_token()? {
                         S => Some(Printc),
                         T => Some(Printi),
                         L => None,
                     },
-                    T => match self.lex.next()? {
+                    T => match self.next_token()? {
                         S => Some(Readc),
                         T => Some(Readi),
                         L => None,
@@ -233,18 +353,18 @@ impl Iterator for Parser<'_> {
             },
 
             // Control flow
-            L => match self.lex.next()? {
-                S => match self.lex.next()? {
+            L => match self.next_token()? {
+                S => match self.next_token()? {
                     S => Some(Label(self.parse_label()?)),
                     T => Some(Call(self.parse_label()?)),
                     L => Some(Jmp(self.parse_label()?)),
                 },
-                T => match self.lex.next()? {
+                T => match self.next_token()? {
                     S => Some(Jz(self.parse_label()?)),
                     T => Some(Jn(self.parse_label()?)),
                     L => Some(Ret),
                 },
-                L => match self.lex.next()? {
+                L => match self.next_token()? {
                     L => Some(End),
                     _ => None,
                 },
@@ -255,19 +375,19 @@ impl Iterator for Parser<'_> {
 
 impl Parser<'_> {
     fn parse_uint(&mut self) -> Option<RawUint> {
-        self.toks.clear();
+        self.tok_buf.clear();
         loop {
-            let tok = self.lex.next()?;
+            let tok = self.next_token()?;
             if tok == L {
                 break;
             }
-            self.toks.push(tok);
+            self.tok_buf.push(tok);
         }
-        Some(RawUint::from_tokens(&self.toks))
+        Some(RawUint::from_tokens(&self.tok_buf))
     }
 
     fn parse_int(&mut self) -> Option<Int> {
-        let sign = match self.lex.next()? {
+        let sign = match self.next_token()? {
             S => Sign::Pos,
             T => Sign::Neg,
             L => return Some(Int::empty()),
