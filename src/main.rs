@@ -8,17 +8,18 @@ mod bit_pack;
 mod syntax;
 mod token;
 use std::{env, fs};
-use syntax::Parser;
+use syntax::{Parser, Version};
 use token::{Lexer, Mapping};
 
 fn main() -> std::io::Result<()> {
     let filename = env::args_os().nth(1).expect("Usage: yspace <file>");
     let src = fs::read(filename)?;
     let mut lex = Lexer::new(&src, Mapping::DEFAULT);
-    let p = Parser::new(&mut lex);
-    let mut v = Vec::new();
-    p.for_each(|inst| inst.to_tokens(&mut v));
-    v.into_iter()
-        .for_each(|tok| print!("{}", Mapping::DEFAULT.to_char(tok)));
+    let mut p = Parser::new(&mut lex);
+    if p.any(|inst| inst.version() == Version::WS0_3) {
+        println!("0.3");
+    } else {
+        println!("0.2");
+    }
     Ok(())
 }

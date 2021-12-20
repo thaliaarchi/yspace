@@ -126,6 +126,13 @@ impl Inst {
             Readi => "readi",
         }
     }
+
+    pub fn version(&self) -> Version {
+        match self {
+            Copy(_) | Slide(_) => Version::WS0_3,
+            _ => Version::WS0_2,
+        }
+    }
 }
 
 impl fmt::Display for Inst {
@@ -138,6 +145,21 @@ impl fmt::Display for Inst {
             write!(f, "{} {}", self.wsa_opcode(), l.val)
         } else {
             write!(f, "{}", self.wsa_opcode())
+        }
+    }
+}
+
+#[derive(Copy, Clone, PartialEq)]
+pub enum Version {
+    WS0_2,
+    WS0_3,
+}
+
+impl fmt::Display for Version {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Version::WS0_2 => write!(f, "0.2"),
+            Version::WS0_3 => write!(f, "0.3"),
         }
     }
 }
