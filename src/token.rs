@@ -69,11 +69,13 @@ impl Mapping {
     };
 
     #[inline]
+    #[must_use]
     pub fn new(s: char, t: char, l: char) -> Self {
         Mapping { s, t, l }
     }
 
     #[inline]
+    #[must_use]
     pub fn from_char(&self, ch: char) -> Option<Token> {
         if ch == self.s {
             Some(S)
@@ -87,6 +89,7 @@ impl Mapping {
     }
 
     #[inline]
+    #[must_use]
     pub fn to_char(&self, tok: Token) -> char {
         match tok {
             S => self.s,

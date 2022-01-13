@@ -40,6 +40,8 @@ pub enum Inst {
 }
 
 impl Inst {
+    #[inline]
+    #[must_use]
     pub fn arg(&self) -> Option<&Int> {
         match self {
             Push(i) => Some(i),
@@ -49,6 +51,8 @@ impl Inst {
         }
     }
 
+    #[inline]
+    #[must_use]
     pub fn label(&self) -> Option<&Label> {
         match self {
             Label(l) => Some(l),
@@ -69,6 +73,7 @@ impl Inst {
         }
     }
 
+    #[must_use]
     pub fn ws_opcode(&self) -> &'static [Token] {
         match self {
             Push(_) => &[S, S],
@@ -98,6 +103,7 @@ impl Inst {
         }
     }
 
+    #[must_use]
     pub fn wsa_opcode(&self) -> &'static str {
         match self {
             Push(_) => "push",
@@ -127,6 +133,8 @@ impl Inst {
         }
     }
 
+    #[inline]
+    #[must_use]
     pub fn version(&self) -> Version {
         match self {
             Copy(_) | Slide(_) => Version::WS0_3,
@@ -178,6 +186,8 @@ pub enum Sign {
 }
 
 impl Int {
+    #[inline]
+    #[must_use]
     fn empty() -> Self {
         Int {
             val: Integer::new(),
@@ -202,6 +212,7 @@ pub struct Label {
 }
 
 impl Label {
+    #[must_use]
     pub fn as_utf8(&self) -> Option<&str> {
         if self.raw.len() % 8 == 0 {
             if let Ok(s) = str::from_utf8(&self.raw.buf) {
@@ -211,6 +222,7 @@ impl Label {
         None
     }
 
+    #[inline]
     pub fn to_tokens(&self, v: &mut Vec<Token>) {
         self.raw.to_tokens(v);
     }
@@ -223,6 +235,8 @@ struct RawUint {
 }
 
 impl RawUint {
+    #[inline]
+    #[must_use]
     fn new() -> Self {
         RawUint {
             buf: Vec::new(),
@@ -230,6 +244,7 @@ impl RawUint {
         }
     }
 
+    #[must_use]
     fn from_tokens(toks: &Vec<Token>) -> Self {
         let len = (toks.len() + 7) / 8;
         let mut buf = vec![0; len];
@@ -259,10 +274,13 @@ impl RawUint {
         toks.push(L)
     }
 
+    #[inline]
+    #[must_use]
     fn bit(&self, i: usize) -> bool {
         (self.buf[i / 8] >> (7 - i % 8)) & 1 == 1
     }
 
+    #[must_use]
     fn leading_zeros(&self) -> usize {
         for (i, b) in self.buf.iter().enumerate() {
             if *b != 0 {
@@ -272,14 +290,20 @@ impl RawUint {
         self.len
     }
 
+    #[inline]
+    #[must_use]
     fn significant_bits(&self) -> usize {
         self.len() - self.leading_zeros()
     }
 
+    #[inline]
+    #[must_use]
     fn to_integer(&self) -> Integer {
         Integer::from_digits(&self.buf, Order::MsfBe)
     }
 
+    #[inline]
+    #[must_use]
     fn len(&self) -> usize {
         self.len
     }
@@ -293,6 +317,8 @@ pub struct Parser<'a> {
 }
 
 impl<'a> Parser<'a> {
+    #[inline]
+    #[must_use]
     pub fn new(lex: &'a mut Lexer<'a>) -> Self {
         Parser {
             lex,
@@ -302,6 +328,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    #[must_use]
     fn next_token(&mut self) -> Option<Token> {
         let (tok, comment) = self.lex.next()?;
         if comment.len() != 0 {
@@ -317,6 +344,7 @@ impl<'a> Parser<'a> {
 impl Iterator for Parser<'_> {
     type Item = Inst;
 
+    #[must_use]
     fn next(&mut self) -> Option<Inst> {
         self.toks = 0;
         match self.next_token()? {
@@ -396,6 +424,7 @@ impl Iterator for Parser<'_> {
 }
 
 impl Parser<'_> {
+    #[must_use]
     fn parse_uint(&mut self) -> Option<RawUint> {
         self.tok_buf.clear();
         loop {
@@ -408,6 +437,7 @@ impl Parser<'_> {
         Some(RawUint::from_tokens(&self.tok_buf))
     }
 
+    #[must_use]
     fn parse_int(&mut self) -> Option<Int> {
         let sign = match self.next_token()? {
             S => Sign::Pos,
@@ -422,6 +452,7 @@ impl Parser<'_> {
         Some(Int { val, raw, sign })
     }
 
+    #[must_use]
     fn parse_label(&mut self) -> Option<Label> {
         let raw = self.parse_uint()?;
         let val = raw.to_integer();
