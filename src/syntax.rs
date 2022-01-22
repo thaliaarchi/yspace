@@ -42,7 +42,7 @@ pub enum Inst {
 impl Inst {
     #[inline]
     #[must_use]
-    pub fn arg(&self) -> Option<&Int> {
+    pub const fn arg(&self) -> Option<&Int> {
         match self {
             Push(i) => Some(i),
             Copy(i) => Some(i),
@@ -53,7 +53,7 @@ impl Inst {
 
     #[inline]
     #[must_use]
-    pub fn label(&self) -> Option<&Label> {
+    pub const fn label(&self) -> Option<&Label> {
         match self {
             Label(l) => Some(l),
             Call(l) => Some(l),
@@ -74,7 +74,7 @@ impl Inst {
     }
 
     #[must_use]
-    pub fn ws_opcode(&self) -> &'static [Token] {
+    pub const fn ws_opcode(&self) -> &'static [Token] {
         match self {
             Push(_) => &[S, S],
             Dup => &[S, L, S],
@@ -104,7 +104,7 @@ impl Inst {
     }
 
     #[must_use]
-    pub fn wsa_opcode(&self) -> &'static str {
+    pub const fn wsa_opcode(&self) -> &'static str {
         match self {
             Push(_) => "push",
             Dup => "dup",
@@ -135,7 +135,7 @@ impl Inst {
 
     #[inline]
     #[must_use]
-    pub fn version(&self) -> Version {
+    pub const fn version(&self) -> Version {
         match self {
             Copy(_) | Slide(_) => Version::WS0_3,
             _ => Version::WS0_2,
@@ -188,7 +188,7 @@ pub enum Sign {
 impl Int {
     #[inline]
     #[must_use]
-    fn empty() -> Self {
+    const fn empty() -> Self {
         Int {
             val: Integer::new(),
             raw: RawUint::new(),
@@ -237,7 +237,7 @@ struct RawUint {
 impl RawUint {
     #[inline]
     #[must_use]
-    fn new() -> Self {
+    const fn new() -> Self {
         RawUint {
             buf: Vec::new(),
             len: 0,
@@ -304,7 +304,7 @@ impl RawUint {
 
     #[inline]
     #[must_use]
-    fn len(&self) -> usize {
+    const fn len(&self) -> usize {
         self.len
     }
 }

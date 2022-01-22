@@ -70,13 +70,16 @@ impl Mapping {
 
     #[inline]
     #[must_use]
-    pub fn new(s: char, t: char, l: char) -> Self {
-        Mapping { s, t, l }
+    pub const fn new(s: char, t: char, l: char) -> Option<Self> {
+        if s == t || t == l || s == l {
+            return None;
+        }
+        Some(Mapping { s, t, l })
     }
 
     #[inline]
     #[must_use]
-    pub fn from_char(&self, ch: char) -> Option<Token> {
+    pub const fn from_char(&self, ch: char) -> Option<Token> {
         if ch == self.s {
             Some(S)
         } else if ch == self.t {
@@ -90,7 +93,7 @@ impl Mapping {
 
     #[inline]
     #[must_use]
-    pub fn to_char(&self, tok: Token) -> char {
+    pub const fn to_char(&self, tok: Token) -> char {
         match tok {
             S => self.s,
             T => self.t,
