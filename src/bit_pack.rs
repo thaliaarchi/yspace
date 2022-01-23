@@ -58,3 +58,20 @@ impl<'a> Iterator for BitLexer<'a> {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::token::test::TUTORIAL_TOKENS;
+
+    #[test]
+    fn bit_lex_tutorial() {
+        let src = [
+            0b00010111, 0b10001000, 0b00101011, 0b01101011, 0b01000010, 0b01001110, 0b11000001,
+            0b01110000, 0b01100001, 0b00101011, 0b10001011, 0b10001000, 0b01001011, 0b11011010,
+            0b00001010, 0b11110001, 0b00001001, 0b01101111, 0b11111100,
+        ];
+        let tokens = BitLexer::new(&src).collect::<Vec<_>>();
+        assert_eq!(tokens, TUTORIAL_TOKENS);
+    }
+}
