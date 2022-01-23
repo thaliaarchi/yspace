@@ -14,8 +14,7 @@ use token::{Lexer, Mapping};
 fn main() -> std::io::Result<()> {
     let filename = env::args_os().nth(1).expect("Usage: yspace <file>");
     let src = fs::read(filename)?;
-    let mut lex = Lexer::new(&src, Mapping::DEFAULT);
-    let mut p = Parser::new(&mut lex);
+    let mut p = Parser::new(Lexer::new(&src, Mapping::DEFAULT));
     if p.any(|inst| inst.version() == Version::WS0_3) {
         println!("0.3");
     } else {

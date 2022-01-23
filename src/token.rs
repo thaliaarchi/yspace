@@ -7,7 +7,7 @@
 use std::{char, str};
 use Token::{L, S, T};
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Token {
     S,
     T,
@@ -50,6 +50,7 @@ impl<'a> Iterator for Lexer<'a> {
     }
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Mapping {
     s: char,
     t: char,
@@ -106,6 +107,9 @@ impl Mapping {
 pub mod test {
     use super::*;
 
+    // Annotated example from tutorial
+    // https://web.archive.org/web/20150618184706/http://compsoc.dur.ac.uk/whitespace/tutorial.php
+    pub const TUTORIAL_SRC: &'static [u8] = b"   \t\n\n   \t    \t\t\n \n \t\n \t   \t \t \n\t\n     \t\n\t    \n    \t \t\t\n\t  \t\n\t  \t   \t \t\n\n \n \t    \t\t\n\n   \t   \t \t\n \n\n\n\n\n";
     pub const TUTORIAL_TOKENS: [Token; 102] = [
         S, S, S, T, L, L, S, S, S, T, S, S, S, S, T, T, L, S, L, S, T, L, S, T, S, S, S, T, S, T,
         S, L, T, L, S, S, S, S, S, T, L, T, S, S, S, S, L, S, S, S, S, T, S, T, T, L, T, S, S, T,
@@ -115,10 +119,7 @@ pub mod test {
 
     #[test]
     fn lex_tutorial() {
-        // Annotated example from tutorial
-        // https://web.archive.org/web/20150618184706/http://compsoc.dur.ac.uk/whitespace/tutorial.php
-        let src = b"   \t\n\n   \t    \t\t\n \n \t\n \t   \t \t \n\t\n     \t\n\t    \n    \t \t\t\n\t  \t\n\t  \t   \t \t\n\n \n \t    \t\t\n\n   \t   \t \t\n \n\n\n\n\n";
-        let tokens = Lexer::new(&src, Mapping::DEFAULT)
+        let tokens = Lexer::new(&TUTORIAL_SRC, Mapping::DEFAULT)
             .map(|(tok, comment)| {
                 assert!(comment.len() == 0);
                 tok

@@ -12,6 +12,7 @@ use rug::{integer::Order, ops::NegAssign, Integer};
 use std::{fmt, str};
 pub use Inst::*;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Inst {
     Push(Int),
     Dup,
@@ -157,7 +158,7 @@ impl fmt::Display for Inst {
     }
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub enum Version {
     WS0_2,
     WS0_3,
@@ -172,13 +173,14 @@ impl fmt::Display for Version {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Int {
     val: Integer,
     raw: RawUint,
     sign: Sign,
 }
 
-#[derive(Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Sign {
     Pos,
     Neg,
@@ -196,22 +198,45 @@ impl Int {
         }
     }
 
-    pub fn to_tokens(&self, v: &mut Vec<Token>) {
+    #[must_use]
+    pub fn from_tokens<T: AsRef<[Token]>>(toks: T) -> Self {
+        match toks.as_ref().split_first() {
+            None => Int::empty(),
+            Some((sign, toks)) => {
+                let raw = RawUint::from_tokens(toks);
+                let val = raw.to_integer();
+                let sign = if *sign == T { Sign::Neg } else { Sign::Pos };
+                Int { raw, val, sign }
+            }
+        }
+    }
+
+    pub fn to_tokens(&self, toks: &mut Vec<Token>) {
         match self.sign {
-            Sign::Pos => v.push(S),
-            Sign::Neg => v.push(T),
+            Sign::Pos => toks.push(S),
+            Sign::Neg => toks.push(T),
             Sign::Empty => {}
         }
-        self.raw.to_tokens(v);
+        self.raw.to_tokens(toks);
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Label {
     val: Integer,
     raw: RawUint,
 }
 
 impl Label {
+    #[inline]
+    #[must_use]
+    const fn empty() -> Self {
+        Label {
+            val: Integer::new(),
+            raw: RawUint::new(),
+        }
+    }
+
     #[must_use]
     pub fn as_utf8(&self) -> Option<&str> {
         if self.raw.len() % 8 == 0 {
@@ -222,13 +247,20 @@ impl Label {
         None
     }
 
+    #[must_use]
+    pub fn from_tokens<T: AsRef<[Token]>>(toks: T) -> Self {
+        let raw = RawUint::from_tokens(toks);
+        let val = raw.to_integer();
+        Label { raw, val }
+    }
+
     #[inline]
     pub fn to_tokens(&self, v: &mut Vec<Token>) {
         self.raw.to_tokens(v);
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct RawUint {
     buf: Vec<u8>,
     len: usize,
@@ -245,7 +277,8 @@ impl RawUint {
     }
 
     #[must_use]
-    fn from_tokens(toks: &Vec<Token>) -> Self {
+    fn from_tokens<T: AsRef<[Token]>>(toks: T) -> Self {
+        let toks = toks.as_ref();
         let len = (toks.len() + 7) / 8;
         let mut buf = vec![0; len];
         let (mut i, mut bit) = (len, 7);
@@ -310,7 +343,7 @@ impl RawUint {
 }
 
 pub struct Parser<'a> {
-    lex: &'a mut Lexer<'a>,
+    lex: Lexer<'a>,
     tok_buf: Vec<Token>,
     toks: usize,
     comments: Option<Vec<String>>,
@@ -319,7 +352,7 @@ pub struct Parser<'a> {
 impl<'a> Parser<'a> {
     #[inline]
     #[must_use]
-    pub fn new(lex: &'a mut Lexer<'a>) -> Self {
+    pub const fn new(lex: Lexer<'a>) -> Self {
         Parser {
             lex,
             tok_buf: vec![],
@@ -457,5 +490,39 @@ impl Parser<'_> {
         let raw = self.parse_uint()?;
         let val = raw.to_integer();
         Some(Label { val, raw })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::token::test::TUTORIAL_SRC;
+    use crate::token::Mapping;
+
+    #[test]
+    fn parse_tutorial() {
+        let p = Parser::new(Lexer::new(&TUTORIAL_SRC, Mapping::DEFAULT));
+        let insts = p.collect::<Vec<_>>();
+        assert_eq!(
+            insts,
+            &[
+                Push(Int::from_tokens(&[S, T])),
+                Label(Label::from_tokens(&[S, T, S, S, S, S, T, T])),
+                Dup,
+                Printi,
+                Push(Int::from_tokens(&[S, T, S, T, S])),
+                Printc,
+                Push(Int::from_tokens(&[S, T])),
+                Add,
+                Dup,
+                Push(Int::from_tokens(&[S, T, S, T, T])),
+                Sub,
+                Jz(Label::from_tokens(&[S, T, S, S, S, T, S, T])),
+                Jmp(Label::from_tokens(&[S, T, S, S, S, S, T, T])),
+                Label(Label::from_tokens(&[S, T, S, S, S, T, S, T])),
+                Drop,
+                End,
+            ]
+        );
     }
 }
