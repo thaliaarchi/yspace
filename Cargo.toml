@@ -3,7 +3,7 @@ name = "yspace"
 version = "0.1.0"
 authors = ["Andrew Archibald <andrew@aarchibald.com>"]
 description = "A work-in-progress toolchain for the Whitespace programming language."
-edition = "2018"
+edition = "2021"
 readme = "README.md"
 homepage = "https://github.com/andrewarchi/yspace"
 repository = "https://github.com/andrewarchi/yspace"
@@ -12,12 +12,9 @@ keywords = ["whitespace", "compiler"]
 categories = ["compilers"]
 
 [dependencies]
-bstr = "0.2.17"
-
-[dependencies.rug]
-version = "1.14.0"
-default-features = false
-features = ["integer"]
+bstr = "0.2"
+clap = { version = "3.0", features = ["derive"] }
+rug = { version = "1.14", default-features = false, features = ["integer"] }
 
 [profile.release]
 lto = true

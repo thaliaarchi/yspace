@@ -4,8 +4,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-use std::{char, str};
-use Token::{L, S, T};
+use std::{char, error, fmt, str};
+use Token::*;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum Token {
@@ -58,17 +58,6 @@ pub struct Mapping {
 }
 
 impl Mapping {
-    pub const DEFAULT: Mapping = Mapping {
-        s: ' ',
-        t: '\t',
-        l: '\n',
-    };
-    pub const STL: Mapping = Mapping {
-        s: 'S',
-        t: 'T',
-        l: 'L',
-    };
-
     #[inline]
     #[must_use]
     pub const fn new(s: char, t: char, l: char) -> Option<Self> {
@@ -103,6 +92,58 @@ impl Mapping {
     }
 }
 
+impl const Default for Mapping {
+    #[inline]
+    #[must_use]
+    fn default() -> Self {
+        Mapping {
+            s: ' ',
+            t: '\t',
+            l: '\n',
+        }
+    }
+}
+
+impl fmt::Display for Mapping {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}{}{}", self.s, self.t, self.l)
+    }
+}
+
+impl str::FromStr for Mapping {
+    type Err = MappingFromStrError;
+
+    fn from_str(v: &str) -> Result<Self, Self::Err> {
+        use MappingFromStrError::*;
+        let mut chars = v.chars();
+        let s = chars.next().ok_or(NotThreeChars)?;
+        let t = chars.next().ok_or(NotThreeChars)?;
+        let l = chars.next().ok_or(NotThreeChars)?;
+        if chars.as_str().len() != 0 {
+            return Err(NotThreeChars);
+        }
+        Mapping::new(s, t, l).ok_or(EqualChars)
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum MappingFromStrError {
+    EqualChars,
+    NotThreeChars,
+}
+
+impl error::Error for MappingFromStrError {}
+
+impl fmt::Display for MappingFromStrError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        use MappingFromStrError::*;
+        match self {
+            EqualChars => write!(f, "characters in mapping are not unique"),
+            NotThreeChars => write!(f, "mapping is not exactly three characters"),
+        }
+    }
+}
+
 #[cfg(test)]
 pub mod test {
     use super::*;
@@ -119,7 +160,7 @@ pub mod test {
 
     #[test]
     fn lex_tutorial() {
-        let tokens = Lexer::new(&TUTORIAL_SRC, Mapping::DEFAULT)
+        let tokens = Lexer::new(&TUTORIAL_SRC, Mapping::default())
             .map(|(tok, comment)| {
                 assert!(comment.len() == 0);
                 tok

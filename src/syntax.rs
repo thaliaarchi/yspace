@@ -6,7 +6,7 @@
 
 use crate::token::{
     Lexer,
-    Token::{self, L, S, T},
+    Token::{self, *},
 };
 use rug::{integer::Order, ops::NegAssign, Integer};
 use std::{fmt, str};
@@ -501,7 +501,7 @@ mod test {
 
     #[test]
     fn parse_tutorial() {
-        let p = Parser::new(Lexer::new(&TUTORIAL_SRC, Mapping::DEFAULT));
+        let p = Parser::new(Lexer::new(&TUTORIAL_SRC, Mapping::default()));
         let insts = p.collect::<Vec<_>>();
         assert_eq!(
             insts,
