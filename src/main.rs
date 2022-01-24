@@ -4,9 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#![feature(const_option)]
-#![feature(const_option_ext)]
-#![feature(const_trait_impl)]
+#![feature(const_option, const_option_ext, const_trait_impl, inline_const)]
 
 mod bit_pack;
 mod syntax;

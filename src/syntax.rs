@@ -313,6 +313,12 @@ impl RawUint {
         (self.buf[i / 8] >> (7 - i % 8)) & 1 == 1
     }
 
+    #[inline]
+    #[must_use]
+    fn has_leading_zeros(&self) -> bool {
+        self.len != 0 && (self.buf[0] >> self.len % 8 == 0)
+    }
+
     #[must_use]
     fn leading_zeros(&self) -> usize {
         for (i, b) in self.buf.iter().enumerate() {
