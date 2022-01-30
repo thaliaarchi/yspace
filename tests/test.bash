@@ -92,6 +92,9 @@ wspace printi_negative_zero.ws && echo
 wspace printi_long_number_334_bits.ws && echo
 wspace printi_long_number_54_bits.ws && echo
 
+echo -n | wspace readc_echo.ws
+echo -n | wspace readi_echo.ws
+
 echo -n 'ß' | wspace readc_echo.ws && echo
 printf '\r\n' | wspace readc_echo.ws && echo
 
